@@ -29,9 +29,15 @@
 <h1>{{ model.title }}</h1>
 
 <div id="controls">
-  <button id="fitBtn">Показать целиком</button>
-  <button id="openDrawingBtn">Чертёж</button>
+  <button id="fitBtn" class="control-btn">Показать целиком</button>
+  <button id="openDrawingBtn" class="control-btn">Чертёж</button>
+
+  <a href="{% url 'model_list' %}" class="control-btn">
+    ← Назад к списку
+  </a>
 </div>
+
+
 
 <div id="viewer"></div>
 

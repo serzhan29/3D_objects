@@ -1,58 +1,166 @@
+:root {
+  --ui-bg: rgba(255, 255, 255, 0.92);
+  --ui-border: rgba(0, 0, 0, 0.12);
+  --ui-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  --ui-accent: #2b6cff;
+  --ui-text: #222;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: "Inter", Arial, sans-serif;
   overflow: hidden;
+  color: var(--ui-text);
+  background: #f2f2f2;
 }
 
+/* ===== TITLE ===== */
 h1 {
   position: fixed;
-  top: 10px;
-  left: 10px;
+  top: 12px;
+  left: 12px;
   z-index: 20;
-  background: #fff;
-  padding: 6px 12px;
+
+  margin: 0;
+  padding: 8px 14px;
+
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  box-shadow: var(--ui-shadow);
+
+  font-size: 16px;
+  font-weight: 600;
 }
 
+/* ===== CONTROL BUTTONS ===== */
+/* ===== CONTROLS PANEL ===== */
 #controls {
   position: fixed;
   top: 70px;
-  left: 10px;
+  left: 12px;
   z-index: 20;
+
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  box-shadow: var(--ui-shadow);
+
+  padding: 10px;
+  width: 200px;   /* ВАЖНО */
 }
 
+
+
+#controls .control-btn,
 #controls button {
   display: block;
-  margin-bottom: 10px;
+  width: 100%;
+
   padding: 8px 14px;
+  margin-bottom: 8px;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  background: #fff;
+  border: 1px solid var(--ui-border);
+  border-radius: 6px;
+  color: var(--ui-text);
+
+  text-align: center;
+  text-decoration: none;
   cursor: pointer;
+
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 
+#controls .control-btn:hover,
+#controls button:hover {
+  background: #f0f4ff;
+  transform: translateY(-1px);
+}
+
+#controls .control-btn:active,
+#controls button:active {
+  transform: translateY(0);
+}
+
+#controls button:last-child,
+#controls .control-btn:last-child {
+  margin-bottom: 0;
+}
+
+
+/* ===== VIEWER ===== */
 #viewer {
   width: 100vw;
   height: 100vh;
 }
 
+/* ===== BACK BUTTON ===== */
+.back-btn {
+  position: fixed;
+  top: 12px;
+  left: 220px;
+  z-index: 25;
+
+  padding: 8px 14px;
+
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  box-shadow: var(--ui-shadow);
+
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ui-text);
+  text-decoration: none;
+
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.back-btn:hover {
+  background: #f0f4ff;
+  transform: translateY(-1px);
+}
+
+/* ===== DRAWING PANEL ===== */
 #drawingPanel {
   position: fixed;
   inset: 0;
-  background: #fff;
   z-index: 50;
+
   display: none;
   flex-direction: column;
+
+  background: #f5f5f5;
 }
 
+/* ===== DRAWING HEADER ===== */
 #drawingHeader {
-  height: 50px;
-  border-bottom: 1px solid #ccc;
-  padding: 10px;
+  height: 52px;
+  padding: 0 16px;
+
+  background: var(--ui-bg);
+  border-bottom: 1px solid var(--ui-border);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  font-weight: 600;
 }
 
+/* ===== PDF ===== */
 #pdfContainer {
   flex: 1;
   overflow: auto;
-  padding: 20px;
+  padding: 24px;
   background: #eaeaea;
 }

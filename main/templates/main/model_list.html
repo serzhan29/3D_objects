@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>3D модели</title>
+</head>
+<body>
+
+<h1>Список 3D моделей</h1>
+
+<ul>
+  {% for model in models %}
+    <li>
+      <a href="{% url 'model_detail' model.pk %}">
+        {{ model.title }}
+      </a>
+    </li>
+  {% empty %}
+    <li>Моделей пока нет</li>
+  {% endfor %}
+</ul>
+
+</body>
+</html>

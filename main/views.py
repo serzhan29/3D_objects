@@ -1,10 +1,16 @@
 from django.shortcuts import render
 from django.shortcuts import render
+from django.views.generic import ListView, DetailView
 from .models import Model3D
 
-def index(request):
-    model = Model3D.objects.first()  # пока берём первую модель
-    return render(request, 'main/index.html', {
-        'model': model
-    })
 
+class Model3DListView(ListView):
+    model = Model3D
+    template_name = 'main/model_list.html'
+    context_object_name = 'models'
+
+
+class Model3DDetailView(DetailView):
+    model = Model3D
+    template_name = 'main/index.html'
+    context_object_name = 'model'
