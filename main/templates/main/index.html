@@ -1,74 +1,13 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <title>3D Viewer (CAD)</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
-    }
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
 
-    h1 {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 20;
-      background: #fff;
-      padding: 6px 12px;
-    }
-
-    /* ===== BUTTONS ===== */
-    #controls {
-      position: fixed;
-      top: 70px;
-      left: 10px;
-      z-index: 20;
-    }
-
-    #controls button {
-      display: block;
-      margin-bottom: 10px;
-      padding: 8px 14px;
-      cursor: pointer;
-    }
-
-    /* ===== 3D VIEW ===== */
-    #viewer {
-      width: 100vw;
-      height: 100vh;
-    }
-
-    /* ===== FULLSCREEN PDF PANEL ===== */
-    #drawingPanel {
-      position: fixed;
-      inset: 0;
-      background: #fff;
-      z-index: 50;
-      display: none;
-      flex-direction: column;
-    }
-
-    #drawingHeader {
-      height: 50px;
-      border-bottom: 1px solid #ccc;
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    #pdfContainer {
-      flex: 1;
-      overflow: auto;
-      padding: 20px;
-      background: #eaeaea;
-    }
-  </style>
-
-  <!-- Three.js import map -->
+  <!-- Import map -->
   <script type="importmap">
   {
     "imports": {
@@ -79,22 +18,23 @@
 
   <!-- PDF.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  </script>
 </head>
 
 <body>
 
 <h1>{{ model.title }}</h1>
 
-<!-- ===== BUTTONS ===== -->
 <div id="controls">
   <button id="fitBtn">Показать целиком</button>
   <button id="openDrawingBtn">Чертёж</button>
 </div>
 
-<!-- ===== 3D VIEW ===== -->
 <div id="viewer"></div>
 
-<!-- ===== FULLSCREEN PDF ===== -->
 <div id="drawingPanel">
   <div id="drawingHeader">
     <strong>Чертёж</strong>
@@ -103,120 +43,14 @@
   <div id="pdfContainer"></div>
 </div>
 
-<script type="module">
-  import * as THREE from "three";
-  import { GLTFLoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
-  import { ArcballControls } from "https://unpkg.com/three@0.160.0/examples/jsm/controls/ArcballControls.js";
-
-  const MODEL_URL = "{{ model.file.url }}";
-  const PDF_URL   = "{{ model.drawing_pdf.url }}";
-
-  /* ===== SCENE ===== */
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xf2f2f2);
-
-  /* ===== CAMERA ===== */
-  const camera = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.001, 100000);
-  camera.position.set(0, 0, 10);
-
-  /* ===== RENDERER ===== */
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.getElementById("viewer").appendChild(renderer.domElement);
-
-  /* ===== LIGHT ===== */
-  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
-  const dir = new THREE.DirectionalLight(0xffffff, 1);
-  dir.position.set(5, 5, 5);
-  scene.add(dir);
-
-  /* ===== CONTROLS ===== */
-  const controls = new ArcballControls(camera, renderer.domElement, scene);
-  controls.enableAnimations = false;
-
-  /* ===== LOAD MODEL ===== */
-  let modelSize = null;
-
-  new GLTFLoader().load(MODEL_URL, (gltf) => {
-    const model = gltf.scene;
-
-    const box = new THREE.Box3().setFromObject(model);
-    const center = box.getCenter(new THREE.Vector3());
-    modelSize = box.getSize(new THREE.Vector3()).length();
-
-    model.position.sub(center);
-    scene.add(model);
-    fitToView();
-  });
-
-  function fitToView() {
-    if (!modelSize) return;
-    const size = modelSize * 1.2;
-    const aspect = window.innerWidth / window.innerHeight;
-
-    camera.left   = -size * aspect;
-    camera.right  =  size * aspect;
-    camera.top    =  size;
-    camera.bottom = -size;
-
-    camera.position.set(0, 0, size);
-    camera.updateProjectionMatrix();
-    controls.update();
-  }
-
-  document.getElementById("fitBtn").onclick = fitToView;
-
-  window.addEventListener("resize", () => {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    fitToView();
-  });
-
-  function animate() {
-    requestAnimationFrame(animate);
-    renderer.render(scene, camera);
-  }
-  animate();
-
-  /* ===== PDF VIEWER (PDF.js) ===== */
-  const pdfContainer = document.getElementById("pdfContainer");
-
-  if (PDF_URL) {
-    pdfjsLib.getDocument(PDF_URL).promise.then(pdf => {
-      for (let i = 1; i <= pdf.numPages; i++) {
-        pdf.getPage(i).then(page => {
-          const viewport = page.getViewport({ scale: 1.3 });
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          canvas.style.display = "block";
-          canvas.style.margin = "0 auto 20px";
-
-          pdfContainer.appendChild(canvas);
-
-          page.render({ canvasContext: ctx, viewport });
-        });
-      }
-    });
-  }
-
-  /* ===== TOGGLE PDF ===== */
-  const drawingPanel = document.getElementById("drawingPanel");
-  const viewer = document.getElementById("viewer");
-
-  document.getElementById("openDrawingBtn").onclick = () => {
-    drawingPanel.style.display = "flex";
-    viewer.style.display = "none";
-  };
-
-  document.getElementById("closeDrawingBtn").onclick = () => {
-    drawingPanel.style.display = "none";
-    viewer.style.display = "block";
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    fitToView();
-  };
+<!-- Django → JS данные -->
+<script>
+  window.MODEL_URL = "{{ model.file.url|default:'' }}";
+  window.PDF_URL = "{{ model.drawing_pdf.url|default:'' }}";
 </script>
+
+<script type="module" src="{% static 'js/3d_model.js' %}"></script>
+<script src="{% static 'js/pdf.js' %}"></script>
 
 </body>
 </html>

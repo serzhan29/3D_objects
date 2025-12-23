@@ -1,58 +1,70 @@
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-import { OrbitControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from "three";
+import { GLTFLoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
+import { ArcballControls } from "https://unpkg.com/three@0.160.0/examples/jsm/controls/ArcballControls.js";
 
+const MODEL_URL = window.MODEL_URL;
 
-console.log('JS loaded');
-console.log('MODEL_URL =', MODEL_URL);
-
+/* SCENE */
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xf2f2f2);
 
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-camera.position.set(0, 0, 5);
+/* CAMERA */
+const camera = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.001, 100000);
+camera.position.set(0, 0, 10);
 
+/* RENDERER */
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+document.getElementById("viewer").appendChild(renderer.domElement);
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-
+/* LIGHT */
 scene.add(new THREE.AmbientLight(0xffffff, 0.9));
-const light = new THREE.DirectionalLight(0xffffff, 0.6);
-light.position.set(5, 10, 7);
-scene.add(light);
+const dir = new THREE.DirectionalLight(0xffffff, 1);
+dir.position.set(5, 5, 5);
+scene.add(dir);
 
-const loader = new GLTFLoader();
-loader.load(
-  MODEL_URL,
-  (gltf) => {
-    console.log('GLB LOADED');
+/* CONTROLS */
+const controls = new ArcballControls(camera, renderer.domElement, scene);
+controls.enableAnimations = false;
+
+let modelSize = null;
+
+if (MODEL_URL) {
+  new GLTFLoader().load(MODEL_URL, (gltf) => {
     const model = gltf.scene;
-    model.position.set(0, 0, 0);
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    modelSize = box.getSize(new THREE.Vector3()).length();
+
+    model.position.sub(center);
     scene.add(model);
-  },
-  undefined,
-  (error) => {
-    console.error('GLB ERROR', error);
-  }
-);
-
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene, camera);
+    fitToView();
+  });
 }
-animate();
 
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+function fitToView() {
+  if (!modelSize) return;
+  const size = modelSize * 1.2;
+  const aspect = window.innerWidth / window.innerHeight;
+
+  camera.left = -size * aspect;
+  camera.right = size * aspect;
+  camera.top = size;
+  camera.bottom = -size;
+
+  camera.position.set(0, 0, size);
   camera.updateProjectionMatrix();
+  controls.update();
+}
+
+document.getElementById("fitBtn").onclick = fitToView;
+
+window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
+  fitToView();
 });
+
+(function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+})();

@@ -1,19 +1,58 @@
-/* Базовый сброс */
-* {
-  box-sizing: border-box;
-}
-
-/* Страница под 3D */
-html, body {
-  width: 100%;
-  height: 100%;
+body {
   margin: 0;
-  padding: 0;
+  font-family: Arial, sans-serif;
   overflow: hidden;
-  background: #f4f4f4;
 }
 
-/* Canvas Three.js */
-canvas {
+h1 {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 20;
+  background: #fff;
+  padding: 6px 12px;
+}
+
+#controls {
+  position: fixed;
+  top: 70px;
+  left: 10px;
+  z-index: 20;
+}
+
+#controls button {
   display: block;
+  margin-bottom: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+#viewer {
+  width: 100vw;
+  height: 100vh;
+}
+
+#drawingPanel {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  z-index: 50;
+  display: none;
+  flex-direction: column;
+}
+
+#drawingHeader {
+  height: 50px;
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#pdfContainer {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+  background: #eaeaea;
 }
