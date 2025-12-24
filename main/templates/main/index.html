@@ -7,7 +7,6 @@
 
   <link rel="stylesheet" href="{% static 'css/main.css' %}">
 
-  <!-- Import map -->
   <script type="importmap">
   {
     "imports": {
@@ -29,34 +28,59 @@
 <h1>{{ model.title }}</h1>
 
 <div id="controls">
-  <button id="fitBtn" class="control-btn">Показать целиком</button>
-  <button id="openDrawingBtn" class="control-btn">Чертёж</button>
-
-  <a href="{% url 'model_list' %}" class="control-btn">
-    ← Назад к списку
-  </a>
+  <button id="fitBtn">Показать целиком</button>
+  <a href="{% url 'model_list' %}">← Назад</a>
 </div>
-
-
 
 <div id="viewer"></div>
 
-<div id="drawingPanel">
-  <div id="drawingHeader">
-    <strong>Чертёж</strong>
-    <button id="closeDrawingBtn">✕ Закрыть</button>
-  </div>
-  <div id="pdfContainer"></div>
+<!-- ===== РАЗРЕЗ ===== -->
+<div id="cut-ui">
+  <h3>Разрез</h3>
+
+  <label>X</label>
+  <input type="range"
+         min="-100" max="100" step="0.1" value="100"
+         oninput="cutX(this.value)">
+
+  <label>Y</label>
+  <input type="range"
+         min="-100" max="100" step="0.1" value="100"
+         oninput="cutY(this.value)">
+
+  <label>Z</label>
+  <input type="range"
+         min="-100" max="100" step="0.1" value="100"
+         oninput="cutZ(this.value)">
+
+  <button onclick="restoreInitialView()">Сброс</button>
+<button onclick="restoreInitialView()">
+  Вернуть
+</button>
+
 </div>
 
-<!-- Django → JS данные -->
+
+<!-- ===== ВИДЫ ===== -->
+<div id="view-ui">
+  <h3>Виды</h3>
+  <button onclick="viewFront()">Спереди</button>
+  <button onclick="viewTop()">Сверху</button>
+  <button onclick="viewSide()">Сбоку</button>
+</div>
+
+<!-- ===== ВЗАИМОДЕЙСТВИЕ ===== -->
+<div id="interaction-ui">
+  <h3>Взаимодействие</h3>
+  <label>Скорость вращения</label>
+  <input type="range" min="0.5" max="3" step="0.1" value="2.2"
+         oninput="setRotateSpeed(this.value)">
+</div>
+
 <script>
   window.MODEL_URL = "{{ model.file.url|default:'' }}";
-  window.PDF_URL = "{{ model.drawing_pdf.url|default:'' }}";
 </script>
 
 <script type="module" src="{% static 'js/3d_model.js' %}"></script>
-<script src="{% static 'js/pdf.js' %}"></script>
-
 </body>
 </html>

@@ -1,0 +1,105 @@
+:root {
+  --bg: #f7f9fc;
+  --card-bg: #ffffff;
+  --border: #e5e7eb;
+  --text: #111827;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 48px 32px;
+  font-family: "Inter", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ===== TITLE ===== */
+h1 {
+  margin: 0 0 32px;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+/* ===== LIST ===== */
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  max-width: 900px;
+}
+
+/* ===== ITEM ===== */
+li {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+
+  margin-bottom: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+li:last-child {
+  margin-bottom: 0;
+}
+
+li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== LINK ===== */
+li a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 20px 24px;
+  text-decoration: none;
+  color: var(--text);
+
+  font-size: 17px;
+  font-weight: 500;
+}
+
+/* ===== ARROW ===== */
+li a::after {
+  content: "→";
+  font-size: 18px;
+  color: var(--accent);
+}
+
+/* ===== EMPTY ===== */
+li:only-child {
+  text-align: center;
+  padding: 48px;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  body {
+    padding: 28px 20px;
+  }
+
+  h1 {
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+
+  li a {
+    padding: 16px 18px;
+    font-size: 16px;
+  }
+}

@@ -1,50 +1,116 @@
 import * as THREE from "three";
-import { GLTFLoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
-import { ArcballControls } from "https://unpkg.com/three@0.160.0/examples/jsm/controls/ArcballControls.js";
+import { createViewer } from "./viewer.js";
+import { setupLighting } from "./lighting.js";
+import { setupControls } from "./controls.js";
+import { loadModel } from "./modelLoader.js";
+import { createClippingPlanes, applyClipping } from "./clipping.js";
 
+/* ================= DATA ================= */
 const MODEL_URL = window.MODEL_URL;
+const container = document.getElementById("viewer");
+let initialViewState = null;
 
-/* SCENE */
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xf2f2f2);
+/* ================= VIEWER ================= */
+const { scene, camera, renderer } = createViewer(container);
+setupLighting(scene);
 
-/* CAMERA */
-const camera = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.001, 100000);
-camera.position.set(0, 0, 10);
+const controls = setupControls(camera, renderer, scene);
 
-/* RENDERER */
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.getElementById("viewer").appendChild(renderer.domElement);
+/* ================= CLIPPING ================= */
+const clipPlanes = createClippingPlanes();
+const CLIP_OFF = 1e6;
 
-/* LIGHT */
-scene.add(new THREE.AmbientLight(0xffffff, 0.9));
-const dir = new THREE.DirectionalLight(0xffffff, 1);
-dir.position.set(5, 5, 5);
-scene.add(dir);
+/* ================= MODEL ================= */
+let modelSize = 1;
+let modelBox = null;
 
-/* CONTROLS */
-const controls = new ArcballControls(camera, renderer.domElement, scene);
-controls.enableAnimations = false;
+/* ===== корректный bounding box (ЛОКАЛЬНЫЙ) ===== */
+function computeLocalBoundingBox(model) {
+  const box = new THREE.Box3();
 
-let modelSize = null;
+  model.traverse((obj) => {
+    if (obj.isMesh) {
+      obj.geometry.computeBoundingBox();
+      box.union(obj.geometry.boundingBox);
+    }
+  });
 
+  return box;
+}
+
+/* ================= LOAD MODEL ================= */
 if (MODEL_URL) {
-  new GLTFLoader().load(MODEL_URL, (gltf) => {
-    const model = gltf.scene;
-    const box = new THREE.Box3().setFromObject(model);
-    const center = box.getCenter(new THREE.Vector3());
-    modelSize = box.getSize(new THREE.Vector3()).length();
+  loadModel(MODEL_URL, scene).then(({ model, size }) => {
+    modelSize = size;
 
-    model.position.sub(center);
-    scene.add(model);
+    modelBox = computeLocalBoundingBox(model);
+    applyClipping(model, clipPlanes);
+    resetCut();
+
     fitToView();
+
+    // 🔥 СНИМОК НАЧАЛЬНОГО СОСТОЯНИЯ
+    initialViewState = {
+      cameraPosition: camera.position.clone(),
+      cameraZoom: camera.zoom,
+      cameraLeft: camera.left,
+      cameraRight: camera.right,
+      cameraTop: camera.top,
+      cameraBottom: camera.bottom,
+      target: controls.target.clone(),
+    };
   });
 }
 
+
+/* ================= CUT LOGIC (PERCENT → MODEL SIZE) ================= */
+function cutByAxis(axis, percent) {
+  if (!modelBox) return;
+
+  const size = modelBox.max[axis] - modelBox.min[axis];
+  const half = size / 2;
+  const p = Number(percent) / 100;
+
+  clipPlanes[axis].constant = p * half;
+}
+
+window.cutX = (v) => cutByAxis("x", v);
+window.cutY = (v) => cutByAxis("y", v);
+window.cutZ = (v) => cutByAxis("z", v);
+
+window.resetCut = () => {
+  clipPlanes.x.constant = CLIP_OFF;
+  clipPlanes.y.constant = CLIP_OFF;
+  clipPlanes.z.constant = CLIP_OFF;
+};
+
+/* ================= INTERACTION ================= */
+window.setRotateSpeed = (v) => {
+  controls.rotateSpeed = Number(v);
+};
+
+/* ================= VIEWS ================= */
+window.viewFront = () => {
+  camera.position.set(0, 0, modelSize * 1.8);
+  camera.lookAt(0, 0, 0);
+  controls.update();
+};
+
+window.viewTop = () => {
+  camera.position.set(0, modelSize * 1.8, 0);
+  camera.lookAt(0, 0, 0);
+  controls.update();
+};
+
+window.viewSide = () => {
+  camera.position.set(modelSize * 1.8, 0, 0);
+  camera.lookAt(0, 0, 0);
+  controls.update();
+};
+
+/* ================= FIT TO VIEW ================= */
 function fitToView() {
-  if (!modelSize) return;
-  const size = modelSize * 1.2;
+  const size = modelSize * 0.8;
   const aspect = window.innerWidth / window.innerHeight;
 
   camera.left = -size * aspect;
@@ -52,19 +118,40 @@ function fitToView() {
   camera.top = size;
   camera.bottom = -size;
 
-  camera.position.set(0, 0, size);
+  camera.position.set(0, 0, size * 1.8);
+  camera.lookAt(0, 0, 0);
+
   camera.updateProjectionMatrix();
+
+  controls.target.set(0, 0, 0);
   controls.update();
+  controls.saveState(); // ← обновляем эталон
 }
 
-document.getElementById("fitBtn").onclick = fitToView;
 
-window.addEventListener("resize", () => {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  fitToView();
-});
+document.getElementById("fitBtn")?.addEventListener("click", fitToView);
 
+/* ================= LOOP ================= */
 (function animate() {
   requestAnimationFrame(animate);
+  controls.update();
   renderer.render(scene, camera);
 })();
+
+
+window.restoreInitialView = () => {
+  if (!initialViewState) return;
+
+  camera.position.copy(initialViewState.cameraPosition);
+  camera.zoom = initialViewState.cameraZoom;
+
+  camera.left = initialViewState.cameraLeft;
+  camera.right = initialViewState.cameraRight;
+  camera.top = initialViewState.cameraTop;
+  camera.bottom = initialViewState.cameraBottom;
+
+  camera.updateProjectionMatrix();
+
+  controls.target.copy(initialViewState.target);
+  controls.update();
+};

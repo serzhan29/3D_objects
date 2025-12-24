@@ -23,7 +23,7 @@ h1 {
   position: fixed;
   top: 12px;
   left: 12px;
-  z-index: 20;
+  z-index: 30;
 
   margin: 0;
   padding: 8px 14px;
@@ -37,7 +37,13 @@ h1 {
   font-weight: 600;
 }
 
-/* ===== CONTROL BUTTONS ===== */
+/* ===== VIEWER (three.js canvas) ===== */
+#viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
 /* ===== CONTROLS PANEL ===== */
 #controls {
   position: fixed;
@@ -51,10 +57,8 @@ h1 {
   box-shadow: var(--ui-shadow);
 
   padding: 10px;
-  width: 200px;   /* ВАЖНО */
+  width: 200px;
 }
-
-
 
 #controls .control-btn,
 #controls button {
@@ -85,48 +89,90 @@ h1 {
   transform: translateY(-1px);
 }
 
-#controls .control-btn:active,
-#controls button:active {
-  transform: translateY(0);
-}
-
 #controls button:last-child,
 #controls .control-btn:last-child {
   margin-bottom: 0;
 }
 
-
-/* ===== VIEWER ===== */
-#viewer {
-  width: 100vw;
-  height: 100vh;
-}
-
-/* ===== BACK BUTTON ===== */
-.back-btn {
+/* ===== CUT PANEL ===== */
+#cut-ui {
   position: fixed;
-  top: 12px;
-  left: 220px;
-  z-index: 25;
+  top: 240px;
+  left: 12px;
+  z-index: 20;
 
-  padding: 8px 14px;
+  width: 220px;
+  padding: 10px;
 
   background: var(--ui-bg);
   border: 1px solid var(--ui-border);
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: var(--ui-shadow);
-
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--ui-text);
-  text-decoration: none;
-
-  transition: background 0.2s ease, transform 0.15s ease;
 }
 
-.back-btn:hover {
-  background: #f0f4ff;
-  transform: translateY(-1px);
+#cut-ui h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+#cut-ui label {
+  font-size: 12px;
+}
+
+#cut-ui input {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+/* ===== VIEW PANEL ===== */
+#view-ui {
+  position: fixed;
+  top: 430px;
+  left: 12px;
+  z-index: 20;
+
+  width: 220px;
+  padding: 10px;
+
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  box-shadow: var(--ui-shadow);
+}
+
+#view-ui h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+#view-ui button {
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+/* ===== INTERACTION PANEL ===== */
+#interaction-ui {
+  position: fixed;
+  bottom: 20px;
+  left: 12px;
+  z-index: 20;
+
+  width: 220px;
+  padding: 10px;
+
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  box-shadow: var(--ui-shadow);
+}
+
+#interaction-ui h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+#interaction-ui input {
+  width: 100%;
 }
 
 /* ===== DRAWING PANEL ===== */
@@ -141,7 +187,6 @@ h1 {
   background: #f5f5f5;
 }
 
-/* ===== DRAWING HEADER ===== */
 #drawingHeader {
   height: 52px;
   padding: 0 16px;
@@ -157,10 +202,94 @@ h1 {
   font-weight: 600;
 }
 
-/* ===== PDF ===== */
 #pdfContainer {
   flex: 1;
   overflow: auto;
   padding: 24px;
   background: #eaeaea;
 }
+
+/* ================= MOBILE ADAPTATION ================= */
+@media (max-width: 768px) {
+
+  /* Заголовок компактнее */
+  h1 {
+    top: 8px;
+    left: 8px;
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+
+  /* Основные кнопки */
+  #controls {
+    top: auto;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: calc(100% - 24px);
+    max-width: 420px;
+
+    display: flex;
+    gap: 8px;
+  }
+
+  #controls button,
+  #controls .control-btn {
+    flex: 1;
+    margin-bottom: 0;
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  /* Панель разреза */
+  #cut-ui {
+    top: auto;
+    bottom: 86px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: calc(100% - 24px);
+    max-width: 420px;
+  }
+
+  /* Панель видов */
+  #view-ui {
+    top: auto;
+    bottom: 240px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: calc(100% - 24px);
+    max-width: 420px;
+  }
+
+  /* Панель взаимодействия */
+  #interaction-ui {
+    top: auto;
+    bottom: 350px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: calc(100% - 24px);
+    max-width: 420px;
+  }
+
+  /* Заголовки панелей */
+  #cut-ui h3,
+  #view-ui h3,
+  #interaction-ui h3 {
+    font-size: 13px;
+  }
+
+  /* Слайдеры крупнее */
+  input[type="range"] {
+    height: 28px;
+  }
+
+  /* Кнопки крупнее */
+  button {
+    min-height: 44px; /* Apple / Google рекомендация */
+  }
+}
+
