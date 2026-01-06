@@ -1,0 +1,25 @@
+<h1>{{ assembly.title }}</h1>
+<p>{{ assembly.description }}</p>
+
+<hr>
+
+{% for step in steps %}
+  <div style="margin-bottom: 30px;">
+    <h2>Шаг {{ step.order }}: {{ step.title }}</h2>
+    <p>{{ step.description }}</p>
+
+    <h4>3D модели:</h4>
+    <ul>
+      {% for model in step.models_3d.all %}
+        <li>
+          {{ model.title }} —
+          <a href="{% url 'model_detail' model.pk %}">
+            Смотреть
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% empty %}
+  <p>Шаги пока не добавлены.</p>
+{% endfor %}

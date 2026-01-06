@@ -1,0 +1,11 @@
+<h1>Сборки</h1>
+
+<ul>
+  {% for assembly in assemblies %}
+    <li>
+      <a href="{% url 'assembly_detail' assembly.pk %}">
+        {{ assembly.title }}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
