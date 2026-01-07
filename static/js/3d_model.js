@@ -30,7 +30,10 @@ function computeLocalBoundingBox(model) {
 
   model.traverse((obj) => {
     if (obj.isMesh) {
+      // убедимся что геометрия имеет вычисленный boundingBox
       obj.geometry.computeBoundingBox();
+      // boundingBox в локальных координатах геометрии — union работает корректно если меши без трансформации,
+      // для сложных иерархий может потребоваться применять world matrix (но это отдельная тема)
       box.union(obj.geometry.boundingBox);
     }
   });
@@ -57,11 +60,10 @@ if (MODEL_URL) {
       cameraRight: camera.right,
       cameraTop: camera.top,
       cameraBottom: camera.bottom,
-      target: controls.target.clone(),
+      target: controls.target ? controls.target.clone() : new THREE.Vector3(0, 0, 0),
     };
   });
 }
-
 
 /* ================= CUT LOGIC (PERCENT → MODEL SIZE) ================= */
 function cutByAxis(axis, percent) {
@@ -90,27 +92,37 @@ window.setRotateSpeed = (v) => {
 };
 
 /* ================= VIEWS ================= */
+/* При смене вида — меняем позицию, target и обновляем проекцию.
+   НЕ трогаем camera.zoom здесь: он должен сохраняться */
 window.viewFront = () => {
   camera.position.set(0, 0, modelSize * 1.8);
+  controls.target.set(0, 0, 0);
   camera.lookAt(0, 0, 0);
+  camera.updateProjectionMatrix();
+  // синхронизируем контролы один раз
   controls.update();
 };
 
 window.viewTop = () => {
   camera.position.set(0, modelSize * 1.8, 0);
+  controls.target.set(0, 0, 0);
   camera.lookAt(0, 0, 0);
+  camera.updateProjectionMatrix();
   controls.update();
 };
 
 window.viewSide = () => {
   camera.position.set(modelSize * 1.8, 0, 0);
+  controls.target.set(0, 0, 0);
   camera.lookAt(0, 0, 0);
+  camera.updateProjectionMatrix();
   controls.update();
 };
 
 /* ================= FIT TO VIEW ================= */
+/* fitToView теперь учитывает текущий camera.zoom — чтобы не затирать зум пользователя */
 function fitToView() {
-  const size = modelSize * 0.8;
+  const size = (modelSize * 0.8) / camera.zoom;
   const aspect = window.innerWidth / window.innerHeight;
 
   camera.left = -size * aspect;
@@ -119,26 +131,43 @@ function fitToView() {
   camera.bottom = -size;
 
   camera.position.set(0, 0, size * 1.8);
+  controls.target.set(0, 0, 0);
   camera.lookAt(0, 0, 0);
 
   camera.updateProjectionMatrix();
 
-  controls.target.set(0, 0, 0);
+  // вызов controls.update() один раз — чтобы Arcball / другие контролы синхронизировались с новым target/position
   controls.update();
   controls.saveState(); // ← обновляем эталон
 }
 
-
 document.getElementById("fitBtn")?.addEventListener("click", fitToView);
 
+/* ================= RESIZE ================= */
+/* при изменении размера окна пересчитываем фруструм с учётом текущего zoom */
+function onWindowResize() {
+  const aspect = window.innerWidth / window.innerHeight;
+  // размер на основе modelSize и текущего zoom, чтобы вид сохранялся
+  const size = (modelSize * 0.8) / camera.zoom;
+
+  camera.left = -size * aspect;
+  camera.right = size * aspect;
+  camera.top = size;
+  camera.bottom = -size;
+
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+window.addEventListener("resize", onWindowResize, { passive: true });
+
 /* ================= LOOP ================= */
+/* ВНИМАНИЕ: controls.update() убран из цикла — ArcballControls мы вызываем вручную при изменениях */
 (function animate() {
   requestAnimationFrame(animate);
-  controls.update();
   renderer.render(scene, camera);
 })();
 
-
+/* ================= RESTORE VIEW ================= */
 window.restoreInitialView = () => {
   if (!initialViewState) return;
 

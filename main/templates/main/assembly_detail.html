@@ -1,25 +1,41 @@
-<h1>{{ assembly.title }}</h1>
-<p>{{ assembly.description }}</p>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/assembly.css' %}">
+<div class="assembly-page">
+<button class="back-btn" onclick="history.back()">
+  ← <Назад></Назад>
+</button>
 
-<hr>
+  <header class="assembly-header">
+    <h1>{{ assembly.title }}</h1>
+    <p>{{ assembly.description }}</p>
+  </header>
 
-{% for step in steps %}
-  <div style="margin-bottom: 30px;">
-    <h2>Шаг {{ step.order }}: {{ step.title }}</h2>
-    <p>{{ step.description }}</p>
+  <div class="steps">
 
-    <h4>3D модели:</h4>
-    <ul>
-      {% for model in step.models_3d.all %}
-        <li>
-          {{ model.title }} —
-          <a href="{% url 'model_detail' model.pk %}">
-            Смотреть
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
+    {% for step in steps %}
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">Шаг {{ step.order }}</span>
+          <h2>{{ step.title }}</h2>
+        </div>
+
+        <p class="step-description">
+          {{ step.description }}
+        </p>
+
+        <ul class="models-list">
+          {% for model in step.models_3d.all %}
+            <li class="model-item">
+              <span class="model-title">{{ model.title }}</span>
+              <a href="{% url 'model_detail' model.pk %}" class="view-btn">
+                Смотреть
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+
   </div>
-{% empty %}
-  <p>Шаги пока не добавлены.</p>
-{% endfor %}
+
+</div>
