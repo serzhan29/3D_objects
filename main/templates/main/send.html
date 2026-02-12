@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>Ноутбук передаёт звук</h2>
+<button id="start">Start mic</button>
+
+<script>
+const ws = new WebSocket("ws://YOUR_IP:8000/ws/mic/");
+let ctx;
+
+document.getElementById("start").onclick = async () => {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+  ctx = new AudioContext({ sampleRate: 44100 });
+  const src = ctx.createMediaStreamSource(stream);
+  const proc = ctx.createScriptProcessor(1024,1,1);
+
+  src.connect(proc);
+  proc.connect(ctx.destination);
+
+  proc.onaudioprocess = e => {
+    const input = e.inputBuffer.getChannelData(0);
+    const buf = new Int16Array(input.length);
+
+    for(let i=0;i<input.length;i++){
+      buf[i] = input[i]*32767;
+    }
+    ws.send(buf.buffer);
+  };
+};
+</script>
+</body>
+</html>

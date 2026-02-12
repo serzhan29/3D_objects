@@ -1,11 +1,91 @@
-<h1>Сборки</h1>
+{% extends "base.html" %}
+{% load static %}
 
-<ul>
-  {% for assembly in assemblies %}
-    <li>
-      <a href="{% url 'assembly_detail' assembly.pk %}">
-        {{ assembly.title }}
-      </a>
-    </li>
-  {% endfor %}
-</ul>
+{% block title %}
+Сборки - 3D Модели
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/model_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/navbar_enhanced.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<nav class="navbar navbar-expand-lg navbar-premium">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'model_list' %}">
+      <i class="fas fa-cube"></i>
+      <span>3D Viewer</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'model_list' %}">
+            <i class="fas fa-cube"></i>
+            <span>Модели</span>
+          </a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'assembly_list' %}">
+            <i class="fas fa-object-group"></i>
+            <span>Сборки</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="page-header">
+    <div>
+      <h1>
+        <i class="fas fa-object-group"></i> Сборки
+      </h1>
+      <p class="header-subtitle">
+        <i class="fas fa-info-circle"></i> Выберите сборку для просмотра пошаговых инструкций
+      </p>
+    </div>
+  </div>
+
+  <div class="models-container">
+    {% if assemblies %}
+    <div class="section-title">
+      <i class="fas fa-list"></i> Доступные сборки ({{ assemblies.count }})
+    </div>
+    
+    <ul class="models-list">
+      {% for assembly in assemblies %}
+        <li class="model-card">
+          <a href="{% url 'assembly_detail' assembly.pk %}" class="model-link" title="Открыть {{ assembly.title }}">
+            <div class="model-icon">
+              <i class="fas fa-tools"></i>
+            </div>
+            <div class="model-content">
+              <span class="model-name">{{ assembly.title }}</span>
+              <span class="model-meta">Пошаговая инструкция</span>
+            </div>
+            <div class="model-arrow">
+              <i class="fas fa-arrow-right"></i>
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-inbox"></i>
+      </div>
+      <h2>Нет доступных сборок</h2>
+      <p>Создайте первую сборку для управления пошаговыми инструкциями</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

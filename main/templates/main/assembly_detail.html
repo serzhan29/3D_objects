@@ -1,13 +1,56 @@
 {% load static %}
+{% extends "base.html" %}
+
+{% block title %}
+{{ assembly.title }} - Сборка
+{% endblock %}
+
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/assembly.css' %}">
+<link rel="stylesheet" href="{% static 'css/navbar_enhanced.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<nav class="navbar navbar-expand-lg navbar-premium">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'model_list' %}">
+      <i class="fas fa-cube"></i>
+      <span>3D Viewer</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'model_list' %}">
+            <i class="fas fa-cube"></i>
+            <span>Модели</span>
+          </a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'assembly_list' %}">
+            <i class="fas fa-object-group"></i>
+            <span>Сборки</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
 <div class="assembly-page">
-<button class="back-btn" onclick="history.back()">
-  ← <Назад></Назад>
-</button>
+  <button class="back-btn" onclick="history.back()">
+    <i class="fas fa-arrow-left"></i>
+    <span>Назад</span>
+  </button>
 
   <header class="assembly-header">
-    <h1>{{ assembly.title }}</h1>
-    <p>{{ assembly.description }}</p>
+    <h1>
+      <i class="fas fa-tools"></i> {{ assembly.title }}
+    </h1>
+    <p class="assembly-description">{{ assembly.description }}</p>
   </header>
 
   <div class="steps">
@@ -15,7 +58,9 @@
     {% for step in steps %}
       <div class="step-card">
         <div class="step-header">
-          <span class="step-number">Шаг {{ step.order }}</span>
+          <span class="step-number">
+            <i class="fas fa-check-circle"></i> Шаг {{ step.order }}
+          </span>
           <h2>{{ step.title }}</h2>
         </div>
 
@@ -23,19 +68,33 @@
           {{ step.description }}
         </p>
 
-        <ul class="models-list">
-          {% for model in step.models_3d.all %}
-            <li class="model-item">
-              <span class="model-title">{{ model.title }}</span>
-              <a href="{% url 'model_detail' model.pk %}" class="view-btn">
-                Смотреть
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
+        {% if step.models_3d.all %}
+        <div class="models-section">
+          <h3 class="models-title">
+            <i class="fas fa-cube"></i> Модели на этом шаге
+          </h3>
+          <ul class="models-list">
+            {% for model in step.models_3d.all %}
+              <li class="model-item">
+                <div class="model-info">
+                  <span class="model-title">
+                    <i class="fas fa-file-code"></i> {{ model.title }}
+                  </span>
+                </div>
+                <a href="{% url 'model_detail' model.pk %}" class="view-btn">
+                  <i class="fas fa-eye"></i>
+                  <span>Смотреть</span>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
       </div>
     {% endfor %}
 
   </div>
 
 </div>
+
+{% endblock %}
