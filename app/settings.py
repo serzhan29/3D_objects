@@ -29,7 +29,7 @@ if not SECRET_KEY:
     raise ValueError("SECRET_KEY не загружен из .env")
 
 ALLOWED_HOSTS = ['*']
-
+CSRF_TRUSTED_ORIGINS = ['https://0a5826575452.ngrok-free.app']
 
 # Application definition
 
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'main',
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -54,7 +55,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+ASGI_APPLICATION = "app.asgi.application"
 ROOT_URLCONF = "app.urls"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
 
 TEMPLATES = [
     {
