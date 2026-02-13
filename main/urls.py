@@ -1,6 +1,9 @@
 from django.urls import path
 from .views import *
 
+# App namespace for template reversing
+app_name = 'main'
+
 urlpatterns = [
     path('', Model3DListView.as_view(), name='model_list'),
     path('model/<int:pk>/', Model3DDetailView.as_view(), name='model_detail'),

@@ -23,7 +23,6 @@ class AssemblyListView(ListView):
     context_object_name = 'assemblies'
 
 
-
 class AssemblyDetailView(DetailView):
     model = Assembly
     template_name = 'main/assembly_detail.html'

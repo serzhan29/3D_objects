@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'main',
     "channels",
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ASGI_APPLICATION = "app.asgi.application"
@@ -140,3 +142,15 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # settings.py
 # Чтобы отрывался iframe
 X_FRAME_OPTIONS = "SAMEORIGIN"
+
+# Django Debug Toolbar
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
+]
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
+    'SHOW_TEMPLATE_CONTEXT': True,
+    'ENABLE_STACKTRACES': True,
+}
