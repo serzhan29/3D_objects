@@ -1,0 +1,823 @@
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #818cf8;
+  --secondary: #8b5cf6;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --dark: #1f2937;
+  --light: #f9fafb;
+  --gray: #6b7280;
+  --gray-light: #e5e7eb;
+  --bg: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  
+  --ui-bg: rgba(255, 255, 255, 0.95);
+  --ui-border: rgba(99, 102, 241, 0.15);
+  --ui-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  --ui-accent: #6366f1;
+  --ui-text: #1f2937;
+  
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Poppins', "Inter", Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  color: var(--ui-text);
+  background: var(--bg);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+
+/* ===== TITLE/HEADER ===== */
+h1 {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 30;
+
+  margin: 0;
+  padding: 12px 18px;
+
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  box-shadow: var(--ui-shadow);
+  backdrop-filter: blur(10px);
+
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--primary);
+  
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+h1 i {
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+/* ===== VIEWER (three.js canvas) ===== */
+#viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+}
+
+/* ===== CONTROLS PANEL ===== */
+#controls {
+  position: fixed;
+  top: 80px;
+  left: 16px;
+  z-index: 20;
+
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  box-shadow: var(--ui-shadow);
+  backdrop-filter: blur(10px);
+
+  padding: 12px;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#controls .control-btn,
+#controls button {
+  display: block;
+  width: 100%;
+
+  padding: 12px 16px;
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+  border: 1px solid var(--gray-light);
+  border-radius: 10px;
+  color: var(--ui-text);
+
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#controls .control-btn i,
+#controls button i {
+  margin-right: 8px;
+  font-size: 15px;
+}
+
+#controls .control-btn:hover,
+#controls button:hover {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+#controls .control-btn:active,
+#controls button:active {
+  transform: translateY(0);
+}
+
+/* ===== CUT PANEL ===== */
+#cut-ui {
+  position: fixed;
+  top: 260px;
+  left: 16px;
+  z-index: 20;
+
+  width: 240px;
+  padding: 16px;
+
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  box-shadow: var(--ui-shadow);
+  backdrop-filter: blur(10px);
+}
+
+#cut-ui h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#cut-ui label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray);
+  display: block;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#cut-ui input {
+  width: 100%;
+  margin-bottom: 14px;
+  height: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  accent-color: var(--primary);
+  border: none;
+  background: linear-gradient(to right, var(--primary-light), var(--primary));
+}
+
+#cut-ui input:last-of-type {
+  margin-bottom: 14px;
+}
+
+#cut-ui button {
+  width: 100%;
+  padding: 10px 14px;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#cut-ui button:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===== PARTS PANEL ===== */
+#parts-ui {
+  position: fixed;
+  top: 80px;
+  right: 16px;
+  z-index: 20;
+
+  width: 280px;
+  max-height: calc(100vh - 120px);
+
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  box-shadow: var(--ui-shadow);
+  backdrop-filter: blur(10px);
+
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+}
+
+#parts-ui h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#parts-ui button {
+  margin-bottom: 10px;
+  padding: 10px 14px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+}
+
+#parts-ui button:hover {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* список деталей */
+.parts-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.parts-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.parts-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.parts-list::-webkit-scrollbar-thumb {
+  background: var(--gray-light);
+  border-radius: 3px;
+}
+
+.parts-list::-webkit-scrollbar-thumb:hover {
+  background: var(--gray);
+}
+
+/* строка детали */
+.part-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 12px;
+  line-height: 1.4;
+
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  border: 1px solid var(--gray-light);
+  border-radius: 10px;
+  
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.part-row:hover {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+  color: white;
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.part-row.off {
+  opacity: 0.5;
+  background: #fafafa;
+}
+
+/* чекбокс */
+.part-row input[type="checkbox"] {
+  accent-color: var(--ui-accent);
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* название детали */
+.part-row label {
+  flex: 1;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+/* ===== VIEW PANEL ===== */
+#view-ui {
+  position: fixed;
+  top: 480px;
+  left: 16px;
+  z-index: 20;
+
+  width: 240px;
+  padding: 16px;
+
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  box-shadow: var(--ui-shadow);
+  backdrop-filter: blur(10px);
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#view-ui h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#view-ui button {
+  width: 100%;
+  padding: 10px 14px;
+  margin: 0;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+  border: 1px solid var(--gray-light);
+  border-radius: 10px;
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+}
+
+#view-ui button:hover {
+  background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+  color: white;
+  border-color: var(--success);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===== INTERACTION PANEL ===== */
+#interaction-ui {
+  position: fixed;
+  bottom: 24px;
+  left: 16px;
+  z-index: 20;
+
+  width: 240px;
+  padding: 16px;
+
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  box-shadow: var(--ui-shadow);
+  backdrop-filter: blur(10px);
+}
+
+#interaction-ui h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#interaction-ui input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--gray-light);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--ui-text);
+  transition: all 0.2s ease;
+}
+
+#interaction-ui input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* ===== DRAWING PANEL ===== */
+#drawingPanel {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+
+  display: none;
+  flex-direction: column;
+
+  background: var(--light);
+}
+
+#drawingHeader {
+  height: 60px;
+  padding: 0 20px;
+
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-bottom: 1px solid var(--primary-light);
+  box-shadow: var(--shadow-lg);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-weight: 700;
+  color: white;
+  font-size: 18px;
+  letter-spacing: -0.5px;
+}
+
+#drawingHeader i {
+  margin-right: 10px;
+}
+
+#drawingHeader button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#drawingHeader button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+#pdfContainer {
+  flex: 1;
+  overflow: auto;
+  padding: 24px;
+  background: #eaeaea;
+}
+
+/* ================= PARTS MODAL ================= */
+
+#partsModal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  background: var(--ui-bg);
+}
+
+/* ===== HEADER ===== */
+#partsModalHeader {
+  height: 60px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-bottom: 1px solid var(--primary-light);
+  box-shadow: var(--shadow-lg);
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.5px;
+  flex-shrink: 0;
+}
+
+#partsModalHeader i {
+  margin-right: 10px;
+}
+
+#partsModalHeader button {
+  font-size: 28px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#partsModalHeader button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+/* ===== BODY ===== */
+#partsModalBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background: var(--light);
+}
+
+#partsModalBody::-webkit-scrollbar {
+  width: 8px;
+}
+
+#partsModalBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#partsModalBody::-webkit-scrollbar-thumb {
+  background: var(--gray-light);
+  border-radius: 4px;
+}
+
+#partsModalBody::-webkit-scrollbar-thumb:hover {
+  background: var(--gray);
+}
+
+/* ===== SHOW ALL BUTTON ===== */
+.show-all-btn {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 16px;
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.show-all-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-xl);
+}
+
+.show-all-btn:active {
+  transform: translateY(-1px);
+}
+
+/* ===== LIST ===== */
+.parts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ===== PART CARD ===== */
+.part-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 14px 16px;
+  background: white;
+  border: 1px solid var(--gray-light);
+  border-radius: 12px;
+
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.part-row:hover {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+  color: white;
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.part-row.off {
+  opacity: 0.4;
+  background: #fafafa;
+}
+
+.part-row.off:hover {
+  opacity: 0.4;
+}
+
+.part-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.part-row label {
+  flex: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+/* ================= MOBILE ADAPTATION ================= */
+@media (max-width: 768px) {
+
+  #partsModal.active {
+    display: flex;
+  }
+
+  /* Заголовок компактнее */
+  h1 {
+    top: 10px;
+    left: 10px;
+    font-size: 16px;
+    padding: 10px 14px;
+    max-width: calc(100% - 20px);
+  }
+
+  /* Основные кнопки - внизу */
+  #controls {
+    top: auto;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: calc(100% - 20px);
+    max-width: none;
+
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  #controls button,
+  #controls .control-btn {
+    flex: 1;
+    margin-bottom: 0;
+    padding: 14px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Панель разреза */
+  #cut-ui {
+    top: auto;
+    bottom: 88px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: calc(100% - 20px);
+    max-width: none;
+  }
+
+  /* Панель видов */
+  #view-ui {
+    top: auto;
+    bottom: 200px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: calc(100% - 20px);
+    max-width: none;
+  }
+
+  /* Панель взаимодействия */
+  #interaction-ui {
+    top: auto;
+    bottom: 280px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: calc(100% - 20px);
+    max-width: none;
+  }
+
+  /* 👉 ПАНЕЛЬ ДЕТАЛЕЙ (ТОЛЬКО МОБИЛКА) */
+  #parts-ui {
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: 16px;
+
+    transform: translateX(-50%);
+    width: calc(100% - 20px);
+    max-width: none;
+    max-height: 240px;
+  }
+
+  /* Заголовки панелей */
+  #cut-ui h3,
+  #view-ui h3,
+  #interaction-ui h3,
+  #parts-ui h3 {
+    font-size: 13px;
+  }
+
+  /* Слайдеры */
+  input[type="range"] {
+    height: 6px;
+  }
+
+  /* Кнопки */
+  button {
+    min-height: 44px;
+  }
+
+  #partsModalHeader {
+    height: 64px;
+    font-size: 18px;
+  }
+
+  #partsModalHeader button {
+    font-size: 28px;
+  }
+
+  #partsModalBody {
+    padding: 20px;
+  }
+
+  .show-all-btn {
+    font-size: 16px;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+
+  .parts-list {
+    gap: 12px;
+  }
+
+  .part-row {
+    padding: 14px 14px;
+    min-height: auto;
+    font-size: 13px;
+    line-height: 1.4;
+    border-radius: 12px;
+  }
+
+  .part-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
+
+  .part-row label {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  #drawingHeader {
+    height: 56px;
+    font-size: 16px;
+    padding: 0 16px;
+  }
+
+  #drawingHeader button {
+    width: 36px;
+    height: 36px;
+    font-size: 22px;
+  }
+}
